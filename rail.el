@@ -62,7 +62,7 @@ The same regexp is used in `inferior-lisp'."
   :type 'regexp
   :group 'rail)
 
-(defcustom rail-default-host "localhost:7888"
+(defcustom rail-default-host "localhost:1111"
   "Default location to connect.
 Unless explicitly given location and port.
 Location and port should be delimited with ':'."
@@ -181,7 +181,8 @@ The CALLBACK function will be called when reply is received."
 (cl-defun rail-current-session (&optional (process (rail-connection)))
   "Return current session id.
 Optionally, it can be passes a PROCESS where the session is."
-  (with-current-buffer (process-buffer process) rail-session))
+  (let ((process (if process process rail-process)))
+    (with-current-buffer (process-buffer process) rail-session)))
 
 ;;; nrepl messages we knows about
 
@@ -362,7 +363,8 @@ rail-repl-buffer."
   (or (get-process (concat "rail/" (rail-locate-running-nrepl-host)))
       (get-process
        (concat "rail/"
-               (rail-extract-host (buffer-name (current-buffer)))))))
+               (rail-extract-host (buffer-name (current-buffer)))))
+      rail-process))
 
 (defun rail-strip-protocol (host)
   "Check if protocol was given and strip it."
@@ -542,9 +544,11 @@ inside a container.")
 
 (defun rail-get-clojure-ns ()
   "If available, get the correct clojure namespace."
-  (and (eq major-mode 'clojure-mode)
-       (fboundp 'clojure-find-ns)
-       (funcall 'clojure-find-ns)))
+  
+  (let ((result (and (eq major-mode 'clojure-mode)
+                     (fboundp 'clojure-find-ns)
+                     (funcall 'clojure-find-ns))))
+    (if result result "")))
 
 (defun rail-get-directory ()
   "Internal function to get project directory."
