@@ -26,7 +26,7 @@ just add the files of the project to the [[https://www.emacswiki.org/emacs/LoadP
 #+END_SRC
 ** Usage
 To start a nREPL session, make sure to have a server properly initialize and then use ~M-x rail~ and
-write the ip and port (eg: "localhost:8983")
+write the ip and port (eg: "localhost:1111")
 
 A REPL will then be pop in the side and you can start typing.
 
